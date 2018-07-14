@@ -1,8 +1,10 @@
 import os
 import sys
 import subprocess
+from pathlib import Path
 
 CONFIGFILE = os.path.expanduser('~/.warprc')
+Path(CONFIGFILE).touch()
 
 def read_config():
     data = {}
@@ -31,6 +33,8 @@ def select_item_fzf(items, prompt):
     return proc.stdout.read().strip().decode('utf-8')
 
 def cmd(args):
+    if len(args) == 0:
+    	args = ["select"]
     if len(args) == 1:
         data = read_config()
         if args[0] in data:
@@ -42,7 +46,8 @@ def cmd(args):
             return
         elif args[0] == 'select':
             key = select_item_fzf(list(data.keys()), 'Select warp dir')
-            os.chdir(data[key])
+	    if len(key):
+	            os.chdir(data[key])
             return
         else:
             print('No such bookmark {}'.format(args[0]))
